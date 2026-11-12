@@ -13,6 +13,14 @@ from qemulab.utils.paths import ensure_private_dir, flash_dir_for, remove_tree
 
 logger = logging.getLogger(__name__)
 
+# Foreground process names a pane may run when it is safe to type scenario commands into it:
+# QEMU itself, or the sudo wrapper that launched it.
+EXPECTED_PANE_PROCESSES = ("qemu-system-", "sudo")
+
+
+class ScenarioAbortError(RuntimeError):
+    """Raised when scenario commands must not be sent to a pane."""
+
 
 class Engine:
     def __init__(self, context: SessionContext):
@@ -168,6 +176,19 @@ class Engine:
             # Apply configuration
             self._apply_node_config(i, pane_idx)
 
+    def _verify_pane_process(self, node_id: int, pane_idx: int) -> None:
+        """Abort the scenario unless the pane runs QEMU (or its sudo wrapper).
+
+        Scenario commands are typed into the pane; if the guest died and a plain shell took
+        over, they would run on the host instead.
+        """
+        current = self.tmux.pane_current_command(pane_idx)
+        if current is None or not current.startswith(EXPECTED_PANE_PROCESSES):
+            raise ScenarioAbortError(
+                f"Node {node_id}: pane {pane_idx} is running {current!r}, expected QEMU "
+                f"({'/'.join(EXPECTED_PANE_PROCESSES)}). Scenario commands were not sent."
+            )
+
     def _apply_node_config(self, node_id: int, pane_idx: int):
         """Applies configuration to a single node, in this order:
         1. Enter config mode (if configured)
@@ -209,6 +230,7 @@ class Engine:
             config = self.ctx.selected_scenario.config
 
             if config.commands:
+                self._verify_pane_process(node_id, pane_idx)
                 logger.info(f"Node {node_id}: Executing scenario commands")
                 for cmd_obj in config.commands:
                     logger.info(f"Node {node_id}: {cmd_obj.description or cmd_obj.command}")
