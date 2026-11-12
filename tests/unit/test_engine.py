@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from qemulab.models.context import SessionContext
-from qemulab.models.scenario import Scenario, ScenarioConfig
-from qemulab.services.engine import Engine
+from qemulab.models.scenario import Command, Scenario, ScenarioConfig
+from qemulab.services.engine import Engine, ScenarioAbortError
 
 
 @pytest.fixture
@@ -190,3 +190,49 @@ def test_prepare_environment_refuses_symlinked_flash_dir(
 
     assert target.exists()
     mock_run.assert_not_called()
+
+
+def _scenario_settings(mock_settings):
+    mock_settings.get_common_commands.return_value = []
+    mock_settings.guest.enter_config_command = None
+    mock_settings.guest.load_config_command = None
+    mock_settings.guest.commit_command = None
+    mock_settings.guest.exit_config_command = None
+
+
+def _ctx_with_commands(mock_context):
+    mock_context.selected_scenario.config.commands = [Command(command="show version")]
+    return mock_context
+
+
+@pytest.mark.parametrize("proc", ["qemu-system-x86_64", "sudo"])
+@patch("qemulab.services.engine.time.sleep")
+@patch("qemulab.services.engine.TmuxService")
+@patch("qemulab.services.engine.settings")
+def test_scenario_commands_sent_when_pane_runs_qemu(
+    mock_settings, mock_tmux_class, _sleep, proc, mock_context
+):
+    _scenario_settings(mock_settings)
+    mock_tmux = mock_tmux_class.return_value
+    mock_tmux.pane_current_command.return_value = proc
+
+    Engine(_ctx_with_commands(mock_context))._apply_node_config(1, 0)
+
+    mock_tmux.send_keys.assert_called_once_with(0, "show version")
+
+
+@pytest.mark.parametrize("proc", ["bash", "zsh", None])
+@patch("qemulab.services.engine.time.sleep")
+@patch("qemulab.services.engine.TmuxService")
+@patch("qemulab.services.engine.settings")
+def test_scenario_aborted_when_pane_runs_something_else(
+    mock_settings, mock_tmux_class, _sleep, proc, mock_context
+):
+    _scenario_settings(mock_settings)
+    mock_tmux = mock_tmux_class.return_value
+    mock_tmux.pane_current_command.return_value = proc
+
+    with pytest.raises(ScenarioAbortError, match="expected QEMU"):
+        Engine(_ctx_with_commands(mock_context))._apply_node_config(1, 0)
+
+    mock_tmux.send_keys.assert_not_called()

@@ -9,17 +9,19 @@ Press `Q` or `Ctrl+C` at any time to exit the application.
 **What happens depends on the current state:**
 
 #### Before Environment Launch
+
 - **No cleanup needed**
 - Application exits immediately
 - No resources to clean up
 
 #### During/After Environment Launch
+
 - **Cleanup confirmation appears**
 - You choose: "Yes, Cleanup" or "No, Keep Running"
 
 ### Cleanup Options
 
-```
+```text
 ┌─ Cleanup Confirmation ──────────────────────┐
 │ QEMU environment is running.                │
 │                                              │
@@ -34,7 +36,9 @@ Press `Q` or `Ctrl+C` at any time to exit the application.
 ```
 
 #### Option 1: Yes, Cleanup (Recommended for finished work)
+
 **Performs full cleanup:**
+
 1. ✓ Sends shutdown signal to all QEMU instances
 2. ✓ Terminates tmux session
 3. ✓ Kills remaining QEMU processes
@@ -44,12 +48,15 @@ Press `Q` or `Ctrl+C` at any time to exit the application.
 7. ✓ Exits application
 
 **Use when:**
+
 - You're done testing
 - You want a clean system
 - You're switching scenarios
 
 #### Option 2: No, Keep Running (Detach mode)
+
 **Keeps environment alive:**
+
 - ✓ QEMU instances keep running
 - ✓ Tmux session stays active
 - ✓ Network interfaces remain
@@ -57,6 +64,7 @@ Press `Q` or `Ctrl+C` at any time to exit the application.
 - ✗ Application exits
 
 **Use when:**
+
 - You want to continue testing later
 - You need to step away temporarily
 - You want to attach to tmux directly
@@ -78,6 +86,7 @@ tmux attach -t qemulab
 ## What Gets Cleaned Up
 
 ### 1. QEMU Processes
+
 ```bash
 # Processes killed:
 QEMU_board1_1
@@ -87,6 +96,7 @@ QEMU_board1_4
 ```
 
 ### 2. Network Resources
+
 ```bash
 # Interfaces removed:
 tap_qlab1_0, tap_qlab1_1  # Node 1
@@ -100,6 +110,7 @@ qlab_data   # Data plane bridge
 ```
 
 ### 3. File System
+
 ```bash
 # Directories removed:
 $XDG_RUNTIME_DIR/qemulab/flash_1/
@@ -113,6 +124,7 @@ qemulab_session_*.log       # Saved session logs
 ```
 
 ### 4. Tmux Session
+
 ```bash
 # Session terminated:
 qemulab
@@ -121,6 +133,7 @@ qemulab
 ```
 
 ### 5. Memory
+
 - All application memory freed
 - Python objects garbage collected
 - File handles closed
@@ -130,7 +143,7 @@ qemulab
 
 Watch the cleanup process in real-time:
 
-```
+```text
 ====================================================================
 Starting cleanup process...
 ====================================================================
@@ -153,6 +166,7 @@ Cleanup completed successfully!
 If cleanup fails or you need to clean up manually:
 
 ### 1. Kill QEMU Processes
+
 ```bash
 # Kill all QEMU instances
 sudo pkill -f "QEMU_pd"
@@ -162,6 +176,7 @@ ps aux | grep QEMU
 ```
 
 ### 2. Kill Tmux Session
+
 ```bash
 # Kill specific session
 tmux kill-session -t qemulab
@@ -171,6 +186,7 @@ tmux ls
 ```
 
 ### 3. Remove Network Interfaces
+
 ```bash
 # Remove tap interfaces
 for i in {1..4}; do
@@ -187,15 +203,17 @@ ip link show | grep -E "(tap_qlab|br_qlab|qlab_data)"
 ```
 
 ### 4. Remove Flash Directories
+
 ```bash
 # Remove all flash directories
-sudo rm -rf $XDG_RUNTIME_DIR/qemulab/flash_*
+rm -rf "$XDG_RUNTIME_DIR"/qemulab/flash_*
 
 # Verify
-ls -la /tmp/qemulab/
+ls -la "$XDG_RUNTIME_DIR"/qemulab/
 ```
 
 ### Complete Manual Cleanup Script
+
 ```bash
 #!/bin/bash
 # cleanup_qemulab.sh - Manual cleanup script
@@ -217,7 +235,7 @@ sudo ip link delete br_qlab 2>/dev/null || true
 sudo ip link delete qlab_data 2>/dev/null || true
 
 # Remove flash
-sudo rm -rf $XDG_RUNTIME_DIR/qemulab/flash_* 2>/dev/null || true
+rm -rf "$XDG_RUNTIME_DIR"/qemulab/flash_* 2>/dev/null || true
 
 echo "Cleanup complete!"
 ```
@@ -225,22 +243,27 @@ echo "Cleanup complete!"
 ## Troubleshooting
 
 ### "Cleanup stuck or slow"
+
 - **Cause**: QEMU processes not responding
 - **Solution**: Wait 10 seconds, then manual cleanup
 
 ### "Network interfaces remain"
+
 - **Cause**: Insufficient permissions
 - **Solution**: Run manual cleanup with sudo
 
 ### "Flash directories not deleted"
+
 - **Cause**: Sudo password not provided or expired
-- **Solution**: Manual removal with `sudo rm -rf`
+- **Solution**: Manual removal with `rm -rf` (the directories are user-owned, no sudo)
 
 ### "Tmux session still exists"
+
 - **Cause**: Cleanup interrupted
 - **Solution**: `tmux kill-session -t qemulab`
 
 ### "Memory not freed"
+
 - **Cause**: Processes still running
 - **Solution**: Kill QEMU processes manually
 
@@ -282,7 +305,7 @@ ip link show | grep -E "tap_qlab|br_qlab"
 tmux ls
 
 # Check flash directories
-ls -la /tmp/qemulab/
+ls -la "$XDG_RUNTIME_DIR"/qemulab/
 
 # View cleanup logs
 cat logs/qemulab.log.jsonl | jq 'select(.message | contains("cleanup"))'

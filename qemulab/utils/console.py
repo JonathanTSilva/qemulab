@@ -9,7 +9,7 @@ import logging
 import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
-from enum import Enum
+from enum import StrEnum
 from shutil import get_terminal_size
 from typing import Any, Literal, TypeVar, overload
 
@@ -42,7 +42,7 @@ console_instance = Console(stderr=True, highlight=False)
 _logger = logging.getLogger("qemulab.console")
 
 
-class _AlertStyles(str, Enum):
+class _AlertStyles(StrEnum):
     """Encapsulates the rich markup for different alert styles."""
 
     INFO = "[bold cyan]\\[*][/bold cyan]"

@@ -73,9 +73,21 @@ Every part of this (directory pattern, file name templates, base path) is a sett
 
 ### Scenarios
 
-A scenario is a directory under `scenarios/` with a `scenario.json` and one `cfg_dutN` file
-per node. See [`scenarios/two-router-link`](scenarios/two-router-link) for a minimal example
+A scenario is a directory under your scenarios path with a `scenario.json` and one `cfg_dutN`
+file per node. The default path is `${XDG_CONFIG_HOME:-~/.config}/qemulab/scenarios`. Set
+`scenarios_path` in your config or `QEMULAB_SCENARIOS_PATH` to use another location. Scenario
+commands are typed into the guest consoles, so point it only at a directory that you alone can
+write to; the current directory is never searched. Before sending scenario commands, qemulab
+checks that the pane is running QEMU (`qemu-system-*`, or the `sudo` wrapper that launched it)
+and aborts the scenario with an error otherwise. See [`scenarios/two-router-link`](scenarios/two-router-link) for a minimal example
 that uses addresses from the RFC 5737 documentation range (192.0.2.0/24).
+
+### Cleanup
+
+`scripts/cleanup_qemulab.sh` kills leftover QEMU processes and the tmux session, removes the
+lab network interfaces (sudo) and deletes `$XDG_RUNTIME_DIR/qemulab/flash_*` (no sudo). A flash
+directory is only removed if it is a plain directory you own inside a parent you own that is
+not a symlink. Without `XDG_RUNTIME_DIR` the flash step is skipped; there is no `/tmp` fallback.
 
 ### Configuration
 

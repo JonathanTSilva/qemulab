@@ -3,20 +3,24 @@
 ## Keyboard Shortcuts
 
 ### Global
+
 - `Q` or `Ctrl+C` - Quit application (with cleanup confirmation)
 - `B` - Go back to previous step (before launch)
 
 ### Navigation
+
 - `B` - Go back to previous step
 - `↑` `↓` - Navigate lists
 - `Enter` - Select item
 - `Tab` - Switch between UI elements
 
 ### Running Page (During/After Launch)
+
 - `L` - Toggle log visibility (show/hide)
 - `S` - Save logs to file (`qemulab_session_YYYYMMDD_HHMMSS.log`)
 
 ### Log Viewing
+
 - `↑` `↓` - Scroll logs line by line
 - `PgUp` `PgDn` - Scroll logs page by page
 - `Home` - Jump to top of logs
@@ -24,7 +28,7 @@
 
 ## Workflow
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │ ● Environment: Stopped    [Status]     │ ← Always visible
 ├─────────────────────────────────────────┤
@@ -64,16 +68,19 @@
 ## File Locations
 
 ### Logs
+
 - **Live logs**: `logs/qemulab.log.jsonl` (structured JSON)
 - **Saved logs**: `qemulab_session_*.log` (plain text, current directory)
 
 ### Configuration
+
 - **Global config**: `qemulab/config/defaults.yaml`
 - **Scenarios**: `scenarios/<scenario_name>/`
   - `scenario.json` - Scenario configuration
   - `cfg_dut1`, `cfg_dut2`, etc. - Device configs
 
 ### Runtime Data
+
 - **Flash storage**: `$XDG_RUNTIME_DIR/qemulab/flash_1/`, `$XDG_RUNTIME_DIR/qemulab/flash_2/`, etc.
 - **Network interfaces**: `tap_qlab1_0`, `tap_qlab1_1`, etc.
 - **Bridges**: `br_qlab`, `qlab_data`
@@ -97,6 +104,7 @@ tmux kill-session -t qemulab
 ```
 
 ### Tmux Pane Navigation
+
 - `Ctrl+B` then `↑↓←→` - Switch between panes
 - `Ctrl+B` then `z` - Zoom current pane (toggle fullscreen)
 - `Ctrl+B` then `[` - Enter copy mode (for selecting text)

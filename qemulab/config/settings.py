@@ -11,6 +11,12 @@ USER_CONFIG_ENV = "QEMULAB_CONFIG"
 DEFAULT_USER_CONFIG = Path("~/.config/qemulab/config.yaml")
 
 
+def default_scenarios_path() -> Path:
+    """Trusted per-user scenarios dir: ${XDG_CONFIG_HOME:-~/.config}/qemulab/scenarios."""
+    base = os.environ.get("XDG_CONFIG_HOME") or "~/.config"
+    return Path(base).expanduser() / "qemulab" / "scenarios"
+
+
 def _load_yaml(path: Path) -> dict[str, Any]:
     if path.is_file():
         with path.open() as f:
@@ -100,7 +106,12 @@ class Settings(BaseSettings):
         ),
     )
     scenarios_path: Path = Field(
-        default_factory=lambda: Path.cwd() / "scenarios", description="Root path for scenarios"
+        default_factory=default_scenarios_path,
+        description=(
+            "Root path for scenarios. Scenario commands are typed into guest consoles, so this "
+            "must be a location only you can write to. "
+            "Default: ${XDG_CONFIG_HOME:-~/.config}/qemulab/scenarios"
+        ),
     )
 
     # Image discovery. Layout: <images_base_path>/<board_dir_template>/<images_subdir>/<kernel file>

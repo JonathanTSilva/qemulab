@@ -5,8 +5,10 @@
 ### The "Sorry, try again" Loop Issue
 
 #### Problem
+
 When pressing "Yes, Cleanup" in the exit dialog, you see:
-```
+
+```text
 [sudo] password for user: 
 Sorry, try again.
 [sudo] password for user: 
@@ -15,7 +17,9 @@ Sorry, try again.
 ```
 
 #### Root Cause
+
 The cleanup process runs in a background thread and tries to execute `sudo` commands, but:
+
 1. The TUI is blocking stdin (keyboard input)
 2. Sudo can't read the password from the terminal
 3. The cached password from launch has expired (default: 15 minutes)
@@ -52,6 +56,7 @@ After the fix, cleanup should work silently:
 ### If Password Still Prompts
 
 #### Check 1: Sudo Timeout
+
 ```bash
 # Check your sudo timeout setting
 sudo -V | grep timeout
@@ -63,6 +68,7 @@ sudo -V | grep timeout
 If you're testing and waiting > 15 minutes between launch and cleanup, the password expires.
 
 **Solution:** Extend sudo timeout temporarily:
+
 ```bash
 # In /etc/sudoers (use visudo):
 Defaults timestamp_timeout=30  # 30 minutes instead of 15
@@ -73,6 +79,7 @@ Defaults timestamp_timeout=30  # 30 minutes instead of 15
 The cleanup uses `self.ctx.sudo_password` from launch. If this is `None`, cleanup will fail.
 
 **Debug:**
+
 ```python
 # In app.py, add logging before cleanup:
 logging.info(f"Sudo password cached: {self.ctx.sudo_password is not None}")
@@ -110,6 +117,7 @@ chmod +x cleanup_qemulab.sh
 ### Advanced: Debug Sudo Issues
 
 #### Enable Sudo Logging
+
 ```bash
 # In /etc/sudoers (use visudo):
 Defaults log_input, log_output
@@ -120,6 +128,7 @@ sudo tail -f /var/log/sudo.log
 ```
 
 #### Test Sudo with Password Pipe
+
 ```bash
 # This is what the app does internally:
 echo "your_password" | sudo -S ls /root
@@ -129,6 +138,7 @@ echo "your_password" | sudo -S ls /root
 ```
 
 #### Check Sudo Group Membership
+
 ```bash
 # Verify you're in the sudo group:
 groups $USER
@@ -143,6 +153,7 @@ sudo usermod -aG sudo $USER
 ### Common Sudo Configurations
 
 #### Ubuntu/Debian Default
+
 ```bash
 # /etc/sudoers
 %sudo   ALL=(ALL:ALL) ALL
@@ -150,6 +161,7 @@ Defaults timestamp_timeout=15
 ```
 
 #### Arch Linux Default
+
 ```bash
 # /etc/sudoers
 %wheel ALL=(ALL:ALL) ALL
@@ -157,6 +169,7 @@ Defaults timestamp_timeout=15
 ```
 
 #### Development-Friendly Config
+
 ```bash
 # /etc/sudoers (use visudo!)
 # Allow your user to run cleanup commands without password
@@ -207,5 +220,5 @@ for i in {1..4}; do
   sudo ip link delete tap_qlab${i}_0
   sudo ip link delete tap_qlab${i}_1
 done
-sudo rm -rf "$XDG_RUNTIME_DIR"/qemulab/flash_*
+rm -rf "$XDG_RUNTIME_DIR"/qemulab/flash_*
 ```

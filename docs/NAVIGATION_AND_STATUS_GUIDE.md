@@ -3,22 +3,27 @@
 ## Environment Status Indicator
 
 ### Location
+
 **Top right corner** of the application, always visible.
 
 ### Status States
 
 #### 🔘 Stopped (Gray)
-```
+
+```text
 ● Environment: Stopped
 ```
+
 - **When**: Initial state, or after cleanup
 - **Meaning**: No QEMU environment running
 - **Available actions**: Start new environment
 
 #### ◐ Starting (Yellow)
-```
+
+```text
 ◐ Environment: Starting...
 ```
+
 - **When**: After clicking "Launch", during setup
 - **Meaning**: Environment is being prepared
 - **What's happening**:
@@ -28,9 +33,11 @@
   - Nodes being configured
 
 #### ● Running (Green)
-```
+
+```text
 ● Environment: Running
 ```
+
 - **When**: Environment fully initialized
 - **Meaning**: All nodes are running and configured
 - **Available actions**:
@@ -44,11 +51,13 @@
 ### Linear Navigation (Original Method)
 
 #### Forward Navigation
+
 - Use **arrow keys** (↑ ↓) to navigate lists
 - Press **Enter** to select and move to next step
 - Automatically progresses through: Board → Version → Scenario → Node Count → Confirmation
 
 #### Backward Navigation
+
 - Press **'B'** key to go back one step
 - Can go back from any step except the first
 - Preserves previous selections
@@ -56,9 +65,10 @@
 ### Direct Navigation (New Feature)
 
 #### Click on Completed Steps
+
 You can now **click on any completed step** in the left sidebar to jump directly to it:
 
-```
+```text
 WIZARD STEPS
 ────────────
 ✓ 1. Board       ← Click here!
@@ -69,11 +79,13 @@ WIZARD STEPS
 ```
 
 **Rules:**
+
 - ✅ Can click: Completed steps (green ✓)
 - ✅ Can click: Active step (white ●)
 - ❌ Can't click: Pending steps (gray ○)
 
 #### Visual Feedback
+
 - **Hover**: Background highlights
 - **Completed steps**: Underline on hover
 - **Clickable**: Changes cursor (if terminal supports)
@@ -81,7 +93,8 @@ WIZARD STEPS
 ### Navigation Scenarios
 
 #### Scenario 1: Change Board Mid-Flow
-```
+
+```text
 Current: Step 4 (Node Count)
 All previous steps completed
 
@@ -99,7 +112,8 @@ If you change board:
 ```
 
 #### Scenario 2: Change Node Count
-```
+
+```text
 Current: Step 5 (Confirmation)
 Reviewing summary
 
@@ -112,7 +126,8 @@ Result:
 ```
 
 #### Scenario 3: Review Earlier Selection
-```
+
+```text
 Current: Step 3 (Scenario)
 
 Action: Click on "2. Version"
@@ -126,7 +141,7 @@ Result:
 
 When you change a selection at an earlier step, the wizard automatically invalidates dependent steps:
 
-```
+```text
 Change Board:
   ✓ Board     ← Changed
   ○ Version     ← Invalidated (new board = different versions)
@@ -151,7 +166,8 @@ Change Scenario:
 ### Cleanup Confirmation Dialog
 
 #### Keyboard Navigation
-```
+
+```text
 ┌─ Cleanup Confirmation ──────────┐
 │ ...                              │
 │  [Yes, Cleanup]  [No, Keep]     │
@@ -159,6 +175,7 @@ Change Scenario:
 ```
 
 **Navigation Keys:**
+
 - **→ (Right Arrow)**: Move to next button
 - **← (Left Arrow)**: Move to previous button
 - **Tab**: Move to next button
@@ -167,11 +184,13 @@ Change Scenario:
 - **Escape**: Cancel (same as "No")
 
 **Visual Feedback:**
+
 - Focused button has **heavy cyan border**
 - Focused button text is **bold**
 
 #### Example Flow
-```
+
+```text
 1. Dialog opens
    → "Yes, Cleanup" is focused (primary action)
 
@@ -188,21 +207,25 @@ Change Scenario:
 ## Keyboard Shortcuts Summary
 
 ### Global
+
 - `Q` or `Ctrl+C` - Quit (with confirmation if running)
 - `B` - Go back one step
 - `L` - Toggle log visibility (on running page)
 - `S` - Save logs to file (on running page)
 
 ### List Navigation
+
 - `↑` `↓` - Navigate items
 - `Enter` - Select item
 - `Tab` - Switch between UI elements
 
 ### Wizard Sidebar
+
 - `Click` on completed step - Jump to that step
 - `Hover` - Visual feedback
 
 ### Modal Dialogs
+
 - `→` `←` - Navigate buttons
 - `Tab` `Shift+Tab` - Navigate buttons
 - `Enter` - Confirm
@@ -211,7 +234,8 @@ Change Scenario:
 ## Tips & Tricks
 
 ### Quick Review Workflow
-```
+
+```text
 1. Complete wizard normally to Step 5 (Confirmation)
 2. Review summary
 3. Click on "2. Version" in sidebar
@@ -224,7 +248,8 @@ Change Scenario:
 ```
 
 ### Quick Change Workflow
-```
+
+```text
 1. At Step 4 (Node Count)
 2. Realize wrong scenario selected
 3. Click "3. Scenario" in sidebar
@@ -235,7 +260,8 @@ Change Scenario:
 ```
 
 ### Status Monitoring
-```
+
+```text
 Watch the status indicator for environment state:
 
 ● Stopped (gray)
@@ -253,18 +279,21 @@ Watch the status indicator for environment state:
 ## Accessibility Features
 
 ### Visual Indicators
+
 - ✅ **Color coding**: Green (complete), Yellow (active), Gray (pending)
 - ✅ **Symbols**: ✓ ● ○ for state
 - ✅ **Hover effects**: Highlights clickable items
 - ✅ **Focus borders**: Shows which button is focused
 
 ### Keyboard-Only Navigation
+
 - ✅ **No mouse required**: All features accessible via keyboard
 - ✅ **Tab navigation**: Works in all dialogs
 - ✅ **Arrow keys**: Navigate lists and buttons
 - ✅ **Enter to confirm**: Consistent across UI
 
 ### Status Visibility
+
 - ✅ **Always visible**: Status indicator in top right
 - ✅ **Clear states**: Text describes exact state
 - ✅ **Color + text**: Not color-dependent

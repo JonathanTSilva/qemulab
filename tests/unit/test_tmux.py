@@ -37,3 +37,16 @@ def test_sensitive_failure_does_not_leak_secret(tmux):
         tmux.send_keys(0, "hunter2", sensitive=True)
     assert "hunter2" not in _logged(log)
     assert "hunter2" not in str(exc.value)
+
+
+def test_pane_current_command(tmux):
+    with patch.object(subprocess, "run") as run:
+        run.return_value = subprocess.CompletedProcess([], 0, stdout="qemu-system-x86\n", stderr="")
+        assert tmux.pane_current_command(0) == "qemu-system-x86"
+    args = run.call_args.args[0]
+    assert args[:4] == ["tmux", "display-message", "-p", "-t"]
+    assert "#{pane_current_command}" in args
+
+
+def test_pane_current_command_unknown_pane(tmux):
+    assert tmux.pane_current_command(5) is None

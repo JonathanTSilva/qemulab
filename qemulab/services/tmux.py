@@ -127,6 +127,26 @@ class TmuxService:
         logger.debug(f"Sending to {target_id}: {REDACTED if sensitive else command}")
         self._run(["send-keys", "-t", target_id, command, "C-m"], sensitive=sensitive)
 
+    def pane_current_command(self, pane_index: int) -> str | None:
+        """Name of the foreground process of a pane, or None if it can't be determined."""
+        if pane_index >= len(self.pane_ids):
+            return None
+        try:
+            out = self._run(
+                [
+                    "display-message",
+                    "-p",
+                    "-t",
+                    self.pane_ids[pane_index],
+                    "#{pane_current_command}",
+                ],
+                check=False,
+            )
+        except Exception as e:
+            logger.warning(f"Could not read current command of pane {pane_index}: {e}")
+            return None
+        return out.strip() or None
+
     def clear_history(self, pane_index: int):
         """Drops the scrollback of a pane (used after typing secrets into it)."""
         if pane_index < len(self.pane_ids):

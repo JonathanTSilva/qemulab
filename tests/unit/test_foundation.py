@@ -20,6 +20,29 @@ def test_settings_load_defaults():
     assert s.guest.password is None
 
 
+def test_scenarios_path_defaults_to_user_config_dir(tmp_path, monkeypatch):
+    """Scenarios default to a per-user location, never the current directory."""
+    monkeypatch.delenv("QEMULAB_SCENARIOS_PATH", raising=False)
+    monkeypatch.setenv("QEMULAB_CONFIG", str(tmp_path / "none.yaml"))
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "xdg"))
+    monkeypatch.chdir(tmp_path)
+    assert Settings().scenarios_path == tmp_path / "xdg" / "qemulab" / "scenarios"
+
+    monkeypatch.delenv("XDG_CONFIG_HOME")
+    monkeypatch.setenv("HOME", str(tmp_path / "home"))
+    assert Settings().scenarios_path == tmp_path / "home" / ".config" / "qemulab" / "scenarios"
+
+
+def test_scenarios_path_overridable(tmp_path, monkeypatch):
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text(f"scenarios_path: {tmp_path / 'from_cfg'}\n")
+    monkeypatch.setenv("QEMULAB_CONFIG", str(cfg))
+    assert Settings().scenarios_path == tmp_path / "from_cfg"
+
+    monkeypatch.setenv("QEMULAB_SCENARIOS_PATH", str(tmp_path / "from_env"))
+    assert Settings().scenarios_path == tmp_path / "from_env"
+
+
 def test_common_command_password_from_env(monkeypatch):
     """Passwords are resolved from the environment, never from code."""
     cmd = CommonCommand(command="enable debug", password_env="QEMULAB_TEST_SECRET")
