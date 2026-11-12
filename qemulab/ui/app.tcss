@@ -1,0 +1,266 @@
+/* --- Global Theme (Nord Palette) --- */
+$surface_main: #2e3440;
+$surface_light: #3b4252;
+$panel_grey: #4c566a;
+$text_main: #d8dee9;
+$accent_cyan: #88c0d0;
+$success_green: #a3be8c;
+$warning_yellow: #ebcb8b;
+$error_red: #bf616a;
+
+Screen {
+    background: $surface_main;
+    color: $text_main;
+}
+
+/* --- Main Layout --- */
+#app-grid {
+    layout: vertical;
+    height: 100%;
+}
+
+#main-content {
+    height: 1fr;
+}
+
+/* --- Status Bar --- */
+#status-bar {
+    height: auto;
+    align: right middle;
+    padding: 0 2;
+    background: $surface_light;
+    border-bottom: solid $panel_grey;
+}
+
+#status-indicator {
+    text-align: right;
+    padding: 1;
+}
+
+#status-indicator.status-stopped {
+    color: #6b7280;
+}
+
+#status-indicator.status-starting {
+    color: $warning_yellow;
+    text-style: bold;
+}
+
+#status-indicator.status-running {
+    color: $success_green;
+    text-style: bold;
+}
+
+/* --- Wizard Layout --- */
+#wizard-grid {
+    layout: grid;
+    grid-size: 2;
+    grid-columns: 25% 75%;
+    grid-rows: 1fr;
+    height: 100%;
+}
+
+/* --- Left Sidebar --- */
+#sidebar {
+    background: $surface_light;
+    border-right: solid $panel_grey;
+    padding: 1 2;
+    height: 100%;
+}
+
+#sidebar-header {
+    text-align: center;
+    text-style: bold;
+    color: $accent_cyan;
+    border-bottom: solid $panel_grey;
+    padding-bottom: 1;
+    margin-bottom: 1;
+}
+
+/* --- Wizard Steps --- */
+StepIndicator {
+    padding: 1;
+    margin-bottom: 1;
+    border-left: solid transparent;
+    color: $text_main;
+    height: auto;
+}
+
+StepIndicator:hover {
+    background: rgba(136, 192, 208, 0.1);
+}
+
+StepIndicator.active {
+    background: $panel_grey;
+    border-left: solid $accent_cyan;
+    text-style: bold;
+    color: white;
+}
+
+StepIndicator.completed {
+    color: $success_green;
+}
+
+StepIndicator.completed:hover {
+    background: rgba(163, 190, 140, 0.1);
+    text-style: underline;
+}
+
+StepIndicator.pending {
+    color: #81a1c1; 
+    text-opacity: 60%;
+}
+
+/* --- Content Area --- */
+#content-area {
+    padding: 1 2;
+    background: $surface_main;
+    height: 100%;
+}
+
+.page-header {
+    text-align: center;
+    color: $accent_cyan;
+    text-style: bold;
+    padding: 1;
+    background: $surface_light;
+    border-bottom: solid $panel_grey;
+    margin-bottom: 1;
+}
+
+/* --- Selection Lists --- */
+SelectionList {
+    height: 100%;
+}
+
+ListView {
+    background: $surface_main;
+    border: none;
+    height: 1fr;
+    margin: 1 0;
+}
+
+ListItem {
+    padding: 1 2;
+    background: $surface_main;
+    color: $text_main;
+}
+
+ListItem:hover {
+    background: $surface_light;
+}
+
+ListItem.--highlight {
+    background: $panel_grey;
+    color: $accent_cyan;
+    text-style: bold;
+    border-left: solid $accent_cyan;
+}
+
+/* --- Summary Card --- */
+#summary-container {
+    align: center middle;
+    height: 1fr;
+}
+
+.summary-card {
+    width: 60%;
+    background: $surface_light;
+    border: solid $accent_cyan;
+    padding: 2;
+}
+
+.key-label {
+    color: $accent_cyan;
+    text-style: bold;
+}
+
+/* --- Running Page Layout --- */
+#status-container {
+    height: 1fr;
+    layout: vertical;
+}
+
+#loading-spinner {
+    height: auto;
+    align: center middle;
+}
+
+#log-hint {
+    text-align: center;
+    color: $accent_cyan;
+    padding: 1;
+    height: auto;
+}
+
+RichLog {
+    background: #1f2329;
+    color: #e5e9f0;
+    border: solid $panel_grey;
+    height: 1fr;
+    scrollbar-color: $accent_cyan;
+    margin-top: 1;
+}
+
+/* --- Buttons --- */
+Button {
+    width: 100%;
+    margin-top: 1;
+    background: $panel_grey;
+    color: white;
+    border: none;
+}
+
+Button.primary {
+    background: $accent_cyan;
+    color: $surface_main;
+    text-style: bold;
+}
+
+/* --- Password Modal --- */
+PasswordModal, CleanupModal {
+    align: center middle;
+}
+
+#password-dialog, #cleanup-dialog {
+    width: 60;
+    height: auto;
+    background: $surface_light;
+    border: thick $accent_cyan;
+    padding: 2;
+}
+
+#cleanup-dialog {
+    width: 70;
+}
+
+.dialog-title {
+    text-align: center;
+    color: $accent_cyan;
+    text-style: bold;
+    padding-bottom: 1;
+    border-bottom: solid $panel_grey;
+    margin-bottom: 1;
+}
+
+.dialog-content {
+    padding: 1 2;
+    margin-bottom: 2;
+}
+
+.dialog-buttons {
+    width: 100%;
+    height: auto;
+    align: center middle;
+}
+
+.dialog-buttons > Button {
+    width: 1fr;
+    margin: 0 1;
+    min-width: 15;
+}
+
+#password-input {
+    margin-top: 1;
+    border: solid $panel_grey;
+}

@@ -1,0 +1,9 @@
+# Built-in defaults. Override with a user config (see README) or QEMULAB_* env vars.
+images_base_path: "~/qemulab/images"
+log_level: "INFO"
+network:
+  mgmt:
+    base_ip: "192.0.2.1"
+    netmask: 24
+    bridge_name: "br_qlab"
+  data_bridge_name: "qlab_data"

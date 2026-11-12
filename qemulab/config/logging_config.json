@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+    "console_formatter": {
+      "format": "%(message)s"
+    },
+    "json_file_formatter": {
+      "()": "qemulab.utils.logging.JSONFormatter"
+    }
+  },
+  "handlers": {
+    "console": {
+      "class": "rich.logging.RichHandler",
+      "level": "INFO",
+      "formatter": "console_formatter",
+      "rich_tracebacks": true,
+      "show_path": false,
+      "show_time": false,
+      "show_level": false,
+      "markup": true
+    },
+    "file": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "level": "DEBUG",
+      "formatter": "json_file_formatter",
+      "filename": "logs/qemulab.log.jsonl",
+      "maxBytes": 10485760,
+      "backupCount": 5,
+      "encoding": "utf8"
+    }
+  },
+  "root": {
+    "level": "DEBUG",
+    "handlers": [
+      "console",
+      "file"
+    ]
+  }
+}

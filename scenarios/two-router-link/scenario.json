@@ -1,0 +1,7 @@
+{
+  "description": "Two routers on a shared data link, each with one address from the 192.0.2.0/24 documentation range.",
+  "commands": [
+    {"command": "show interfaces", "description": "List interfaces after configuration is applied"},
+    {"command": "ping 192.0.2.12", "description": "Check reachability of the peer"}
+  ]
+}

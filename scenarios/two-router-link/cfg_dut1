@@ -1,0 +1,4 @@
+hostname router1
+interface eth1
+ ip address 192.0.2.11/24
+ no shutdown
