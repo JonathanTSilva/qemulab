@@ -1,6 +1,9 @@
-# qemulab
-
-➕ A modern TUI for managing QEMU development environments
+<!-- brand:header:start -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/brand/header-265fdc26-dark.svg">
+  <img alt="qemulab: A modern TUI for managing QEMU development environments" src="assets/brand/header-265fdc26-light.svg" width="100%">
+</picture>
+<!-- brand:header:end -->
 
 <!-- badges:start -->
 [![Status](https://img.shields.io/badge/status-wip-yellow?style=flat-square)](https://www.repostatus.org/#wip)
@@ -132,3 +135,10 @@ and PRs are squash-merged.
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+<!-- brand:footer:start -->
+<p align="right"><a href="https://www.jontobias.com"><picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/JonathanTSilva/.github/main/assets/brand/jontobias-dark.svg">
+  <img alt="jontobias.com" src="https://raw.githubusercontent.com/JonathanTSilva/.github/main/assets/brand/jontobias-light.svg" width="200">
+</picture></a></p>
+<!-- brand:footer:end -->
