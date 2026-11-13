@@ -5,6 +5,8 @@
 <!-- badges:start -->
 [![Status](https://img.shields.io/badge/status-wip-yellow?style=flat-square)](https://www.repostatus.org/#wip)
 [![CI](https://img.shields.io/github/actions/workflow/status/JonathanTSilva/qemulab/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/JonathanTSilva/qemulab/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/JonathanTSilva/qemulab/graph/badge.svg)](https://codecov.io/gh/JonathanTSilva/qemulab)
+[![Quality](https://sonarcloud.io/api/project_badges/measure?project=JonathanTSilva_qemulab&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=JonathanTSilva_qemulab)
 [![Scorecard](https://img.shields.io/ossf-scorecard/github.com/JonathanTSilva/qemulab?style=flat-square&label=scorecard)](https://scorecard.dev/viewer/?uri=github.com/JonathanTSilva/qemulab)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Codespaces](https://img.shields.io/badge/codespaces-open-181717?style=flat-square&logo=github)](https://codespaces.new/JonathanTSilva/qemulab)

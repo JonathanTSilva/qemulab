@@ -16,7 +16,7 @@ echo -e "${YELLOW}╚═══════════════════�
 echo ""
 
 # Check if running with sudo or can sudo
-if [ "$EUID" -ne 0 ]; then 
+if [[ "$EUID" -ne 0 ]]; then 
     echo -e "${YELLOW}⚠  This script requires sudo privileges.${NC}"
     echo "Testing sudo access..."
     
@@ -74,7 +74,7 @@ if sudo ip link delete qlab_data 2>/dev/null; then
     iface_count=$((iface_count + 1))
 fi
 
-if [ $iface_count -gt 0 ]; then
+if [[ $iface_count -gt 0 ]]; then
     echo -e "${GREEN}  ✓ Removed $iface_count network interfaces${NC}"
     cleanup_count=$((cleanup_count + 1))
 else
@@ -86,17 +86,17 @@ echo -e "${YELLOW}[4/5]${NC} Removing flash directories..."
 flash_count=0
 flash_skipped=0
 
-if [ -z "${XDG_RUNTIME_DIR:-}" ]; then
+if [[ -z "${XDG_RUNTIME_DIR:-}" ]]; then
     echo -e "${YELLOW}  ⚠ XDG_RUNTIME_DIR is not set; skipping flash directory removal${NC}"
     flash_skipped=1
 else
     flash_parent="${XDG_RUNTIME_DIR}/qemulab"
     for i in {1..10}; do
         d="${flash_parent}/flash_${i}"
-        [ -e "$d" ] || [ -L "$d" ] || continue
+        [[ -e "$d" || -L "$d" ]] || continue
         # Only remove plain directories we own, under a parent we own that is not a symlink.
-        if [ -O "$d" ] && [ ! -L "$d" ] && [ -d "$d" ] \
-            && [ -O "$flash_parent" ] && [ ! -L "$flash_parent" ] && [ -d "$flash_parent" ]; then
+        if [[ -O "$d" && ! -L "$d" && -d "$d" ]] \
+            && [[ -O "$flash_parent" && ! -L "$flash_parent" && -d "$flash_parent" ]]; then
             if rm -rf -- "$d" 2>/dev/null; then
                 flash_count=$((flash_count + 1))
             fi
@@ -106,10 +106,10 @@ else
     done
 fi
 
-if [ $flash_count -gt 0 ]; then
+if [[ $flash_count -gt 0 ]]; then
     echo -e "${GREEN}  ✓ Removed $flash_count flash directories${NC}"
     cleanup_count=$((cleanup_count + 1))
-elif [ $flash_skipped -eq 0 ]; then
+elif [[ $flash_skipped -eq 0 ]]; then
     echo -e "${GREEN}  ✓ No flash directories found${NC}"
 fi
 
@@ -145,7 +145,7 @@ else
 fi
 
 # Check flash directories
-if [ -z "${XDG_RUNTIME_DIR:-}" ]; then
+if [[ -z "${XDG_RUNTIME_DIR:-}" ]]; then
     echo -e "${YELLOW}  ⚠ Flash directories not checked (XDG_RUNTIME_DIR unset)${NC}"
     verify_count=$((verify_count + 1))
 elif ls -d "${XDG_RUNTIME_DIR}"/qemulab/flash_* >/dev/null 2>&1; then
@@ -159,11 +159,11 @@ fi
 echo ""
 echo -e "${YELLOW}╔═══════════════════════════════════════╗${NC}"
 
-if [ $verify_count -eq 4 ]; then
+if [[ $verify_count -eq 4 ]]; then
     echo -e "${GREEN}║      ✓ CLEANUP SUCCESSFUL!           ║${NC}"
     echo -e "${YELLOW}╚═══════════════════════════════════════╝${NC}"
     exit 0
-elif [ $cleanup_count -gt 0 ]; then
+elif [[ $cleanup_count -gt 0 ]]; then
     echo -e "${YELLOW}║   ⚠  CLEANUP PARTIALLY SUCCESSFUL    ║${NC}"
     echo -e "${YELLOW}╚═══════════════════════════════════════╝${NC}"
     echo ""

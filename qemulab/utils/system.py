@@ -11,9 +11,11 @@ class SystemCheck:
     @staticmethod
     def check_all() -> bool:
         """Runs all system checks. Returns True if passed, False otherwise."""
-        checks = [SystemCheck.check_tools, SystemCheck.check_kvm, SystemCheck.check_sudo_access]
+        checks = [SystemCheck.check_tools, SystemCheck.check_kvm]
 
         results = [check() for check in checks]
+        # Advisory only: never affects the result.
+        SystemCheck.warn_if_sudo_needs_password()
         return all(results)
 
     @staticmethod
@@ -38,16 +40,15 @@ class SystemCheck:
         return True
 
     @staticmethod
-    def check_sudo_access() -> bool:
+    def warn_if_sudo_needs_password() -> None:
         """
-        Checks if the user has sudo access.
+        Warns when sudo would prompt for a password.
         We don't want to prompt for password here, just check if we CAN sudo.
+        Not a hard failure, so it returns nothing.
         """
         try:
             # sudo -n true: Check non-interactively if we have cached credentials or NOPASSWD
             subprocess.run(["sudo", "-n", "true"], check=True, stderr=subprocess.DEVNULL)
-            return True
         except subprocess.CalledProcessError:
             # If failed, we warn the user they might be prompted later
             logger.warning("Sudo requires password. You will be prompted in the UI/Terminal.")
-            return True  # Not a hard failure, just a warning
