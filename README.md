@@ -1,7 +1,7 @@
 <!-- brand:header:start -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/brand/header-265fdc26-dark.svg">
-  <img alt="qemulab: A modern TUI for managing QEMU development environments" src="assets/brand/header-265fdc26-light.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/brand/header-8d3e543c-dark.svg">
+  <img alt="qemulab: A modern TUI for managing QEMU development environments" src="assets/brand/header-8d3e543c-light.svg" width="100%">
 </picture>
 <!-- brand:header:end -->
 
