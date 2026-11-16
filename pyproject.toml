@@ -107,9 +107,6 @@ log_cli = false                    # Don't show logs in CLI
 log_cli_level = "CRITICAL"         # Only show critical logs if enabled
 log_file_level = "DEBUG"           # But log everything to file if log_file is set
 log_auto_indent = true
-# Capture configuration - suppress all output
-capture = "sys"                    # Capture stdout/stderr
-show_capture = "no"                # Don't show captured output even on failure
 # Coverage
 addopts = [
     "--strict-markers",
@@ -120,6 +117,8 @@ addopts = [
     "-ra",                         # Show summary of all test outcomes
     "--tb=short",                  # Shorter traceback format
     "-p", "no:warnings",           # Disable warnings plugin
+    "--capture=sys",               # Capture stdout/stderr
+    "--show-capture=no",           # Don't show captured output even on failure
 ]
 # Markers
 markers = [
