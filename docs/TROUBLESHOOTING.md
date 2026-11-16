@@ -38,7 +38,7 @@ proc = subprocess.Popen(
     ["sudo", "-S"] + cmd,  # -S reads password from stdin
     stdin=subprocess.PIPE,
     stdout=subprocess.DEVNULL,
-    stderr=subprocess.DEVNULL
+    stderr=subprocess.DEVNULL,
 )
 proc.communicate(input=f"{sudo_password}\n".encode())
 ```

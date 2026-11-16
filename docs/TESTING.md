@@ -89,14 +89,15 @@ def test_something():
 ```python
 from unittest.mock import patch, MagicMock
 
+
 @patch("qemulab.services.engine.NetworkService")
 def test_with_mock(mock_network):
     """Test that uses a mock."""
     mock_network.setup_bridge.return_value = True
-    
+
     # Test code
     result = engine.prepare()
-    
+
     # Verify mock was called
     mock_network.setup_bridge.assert_called_once()
 ```
@@ -105,6 +106,7 @@ def test_with_mock(mock_network):
 
 ```python
 import pytest
+
 
 @pytest.mark.asyncio
 async def test_async_function():
