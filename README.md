@@ -15,13 +15,25 @@
 [![Codespaces](https://img.shields.io/badge/codespaces-open-181717?style=flat-square&logo=github)](https://codespaces.new/JonathanTSilva/qemulab)
 <!-- badges:end -->
 
+**Spin up a multi-node QEMU network lab from your terminal.** Pick a board, a firmware version and a scenario, and qemulab builds the network, boots every node in its own tmux pane and loads each node's configuration for you.
+
+<p align="center">
+  <img src="assets/screenshots/wizard-scenario.png" alt="The qemulab wizard on the scenario step, listing the two-router-link scenario with 2 nodes" width="49%">
+  <img src="assets/screenshots/wizard-launch.png" alt="The qemulab wizard on the confirmation step, showing board, version, scenario and node count before launch" width="49%">
+</p>
+
+*The wizard picks up scenarios from disk (left) and confirms the whole lab before launch (right). The images here are empty placeholders.*
+
 ## What it is
 
-qemulab is a terminal UI built with [Textual](https://textual.textualize.io/) that
-orchestrates small QEMU labs of network appliances. It provisions the Linux bridges and tap
-interfaces, boots several guest images side by side in tmux panes, and injects per-node
-configuration from a scenario. Image layout, guest login and config-mode commands are all
-configurable, so it works with any kernel and initrd pair.
+A terminal UI built with [Textual](https://textual.textualize.io/) that orchestrates small QEMU labs of network appliances. Image layout, guest login and config-mode commands are all configurable, so it works with any kernel and initrd pair. The project is a work in progress.
+
+- **A five-step wizard.** Board, image version, scenario, node count, then a summary to confirm.
+- **The network, done for you.** It provisions the Linux bridges and tap interfaces the nodes need.
+- **Every node in view.** Guests boot side by side in tmux panes, and the TUI shows environment status and logs.
+- **Scenarios as plain files.** A `scenario.json` plus one `cfg_dutN` file per node. qemulab types each node's configuration into its console.
+- **Careful with sudo and secrets.** It asks for your sudo password once, never types it into a pane when the sudo timestamp can be shared, and ships no credentials by default.
+- **A cleanup script.** `scripts/cleanup_qemulab.sh` removes leftover QEMU processes, the tmux session and the lab interfaces.
 
 ## Quick start
 
@@ -29,11 +41,16 @@ configurable, so it works with any kernel and initrd pair.
 git clone https://github.com/JonathanTSilva/qemulab.git
 cd qemulab
 uv sync
-uv run pytest
+uv run -m qemulab check    # verify the host can run a lab
 ```
 
-Or open it in a dev container or GitHub Codespaces. Running a lab needs `qemu-system-x86_64`,
-`ip`, `tmux`, `sudo` and `/dev/kvm` on the host.
+Running a lab needs `qemu-system-x86_64`, `ip`, `tmux`, `sudo` and `/dev/kvm` on the host, plus your own kernel and initrd images. To try the bundled example scenario:
+
+```sh
+QEMULAB_SCENARIOS_PATH="$PWD/scenarios" uv run -m qemulab start
+```
+
+You can also open the repository in a dev container or GitHub Codespaces to work on the code and run the tests with `uv run pytest`. A lab itself needs a host with KVM.
 
 ## Usage
 
@@ -42,30 +59,9 @@ uv run -m qemulab start    # launch the TUI wizard
 uv run -m qemulab check    # verify host requirements
 ```
 
-The wizard walks through board, image version, scenario and node count, then launches the
-environment. Press the documented keys to view logs or clean up (see the docs).
+`start` takes `--verbose`, `--config <file>` and `--force` (skip the host checks). In the TUI, `Q` quits, `B` goes back a step, `L` toggles the log view and `S` saves the logs.
 
-### Sudo
-
-qemulab asks for your sudo password once and validates it from Python (`sudo -S -v`), so the
-tmux panes reuse the cached sudo timestamp and the password is never typed into a pane.
-
-If your sudoers config uses `tty_tickets` (the default on many distros), a pane cannot share
-that timestamp. qemulab then falls back to sending the password with a leading space and
-`HISTCONTROL=ignorespace`, redacted from logs. A narrow sudoers rule avoids this and is
-recommended, for example (adjust paths with `command -v`):
-
-```text
-youruser ALL=(root) NOPASSWD: /usr/bin/qemu-system-x86_64, /usr/bin/ip, /usr/bin/tunctl
-```
-
-Per-node flash dirs and configs are created as your user (mode 0700) under
-`$XDG_RUNTIME_DIR/qemulab`, or a private `qemulab-*` temp dir when that is unset. Set
-`flash_base_path` to override the location. sudo is only used to remove dirs that QEMU filled
-with root-owned files, and only after checking the path has no symlink components and is owned
-by you.
-
-### Image layout
+### Images
 
 By default qemulab looks for images under `~/qemulab/images`:
 
@@ -78,49 +74,13 @@ Every part of this (directory pattern, file name templates, base path) is a sett
 
 ### Scenarios
 
-A scenario is a directory under your scenarios path with a `scenario.json` and one `cfg_dutN`
-file per node. The default path is `${XDG_CONFIG_HOME:-~/.config}/qemulab/scenarios`. Set
-`scenarios_path` in your config or `QEMULAB_SCENARIOS_PATH` to use another location. Scenario
-commands are typed into the guest consoles, so point it only at a directory that you alone can
-write to; the current directory is never searched. Before sending scenario commands, qemulab
-checks that the pane is running QEMU (`qemu-system-*`, or the `sudo` wrapper that launched it)
-and aborts the scenario with an error otherwise. See [`scenarios/two-router-link`](scenarios/two-router-link) for a minimal example
-that uses addresses from the RFC 5737 documentation range (192.0.2.0/24).
+A scenario is a directory with a `scenario.json` and one `cfg_dutN` file per node, under `${XDG_CONFIG_HOME:-~/.config}/qemulab/scenarios` by default. See [`scenarios/two-router-link`](scenarios/two-router-link) for a minimal example that uses addresses from the RFC 5737 documentation range (192.0.2.0/24). Scenario commands are typed into guest consoles, so point `scenarios_path` only at a directory that you alone can write to.
 
-### Cleanup
-
-`scripts/cleanup_qemulab.sh` kills leftover QEMU processes and the tmux session, removes the
-lab network interfaces (sudo) and deletes `$XDG_RUNTIME_DIR/qemulab/flash_*` (no sudo). A flash
-directory is only removed if it is a plain directory you own inside a parent you own that is
-not a symlink. Without `XDG_RUNTIME_DIR` the flash step is skipped; there is no `/tmp` fallback.
-
-### Configuration
-
-Settings are read, in order of precedence, from `QEMULAB_*` environment variables, a user
-config file (`~/.config/qemulab/config.yaml`, or the path in `QEMULAB_CONFIG`), and the packaged
-`defaults.yaml`. Nothing sensitive ships by default. Guest credentials and any commands that
-need a password are yours to supply:
-
-```yaml
-# ~/.config/qemulab/config.yaml
-images_base_path: ~/qemulab/images
-guest:
-  login_prompt: "login:"
-  username: labuser
-  password: labpass
-  enter_config_command: configure
-  load_config_command: "load {file}"
-  commit_command: commit
-  exit_config_command: exit
-common_commands:
-  - command: enable-debug
-    password_env: QEMULAB_DEBUG_PASSWORD   # read from the environment, never stored
-    description: Enable debug features
-```
+Sudo handling, image and scenario settings, cleanup and the config file are covered in the [configuration guide](docs/CONFIGURATION.md).
 
 ## Docs
 
-More guides live in [`docs/`](docs): [quick reference](docs/QUICK_REFERENCE.md),
+More guides live in [`docs/`](docs): [configuration](docs/CONFIGURATION.md), [quick reference](docs/QUICK_REFERENCE.md),
 [navigation](docs/NAVIGATION_AND_STATUS_GUIDE.md), [cleanup](docs/CLEANUP_AND_EXIT_GUIDE.md),
 [troubleshooting](docs/TROUBLESHOOTING.md), [FAQ](docs/FAQ.md) and [testing](docs/TESTING.md).
 The conventions this repository follows are in the
