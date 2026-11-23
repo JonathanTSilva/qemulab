@@ -61,17 +61,19 @@ class QemuLabApp(App):
 
         yield Footer()
 
-    def on_mount(self) -> None:
+    async def on_mount(self) -> None:
         """Initialize the application when mounted."""
         # Create and mount wizard screen
         self._wizard_screen = WizardScreen(self.ctx)
         wizard_container = self.query_one("#wizard-content", Vertical)
-        wizard_container.mount(self._wizard_screen)
+        await wizard_container.mount(self._wizard_screen)
 
         # Create and mount running screen
         self._running_screen = RunningScreen()
         running_container = self.query_one("#running-content", Vertical)
-        running_container.mount(self._running_screen)
+        # Await the mount so the screen's children (the log view) exist before
+        # logging is attached; otherwise query_one fails under run_test().
+        await running_container.mount(self._running_screen)
         self._running_screen.setup_logging()
 
         # Update status indicator
