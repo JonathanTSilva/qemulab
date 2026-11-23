@@ -1,8 +1,9 @@
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
-from qemulab.config.settings import CommonCommand, Settings
+from qemulab.config.settings import CommonCommand, ConfigFormatError, Settings
 from qemulab.models.scenario import ScenarioConfig
 
 
@@ -84,3 +85,26 @@ def test_scenario_config_defaults():
     raw_json = {"description": "Minimal"}
     model = ScenarioConfig(**raw_json)
     assert model.commands == []
+
+
+@pytest.mark.parametrize(
+    "content",
+    ["- a\n- b\n", "just a string\n", "1: x\n"],
+    ids=["list", "scalar", "non-string-key"],
+)
+def test_user_config_must_be_a_string_keyed_mapping(tmp_path, monkeypatch, content):
+    """A user config that is not a mapping with string keys fails with ConfigFormatError."""
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text(content)
+    monkeypatch.setenv("QEMULAB_CONFIG", str(cfg))
+    with pytest.raises(ConfigFormatError):
+        Settings()
+
+
+def test_unknown_home_user_is_a_validation_error(tmp_path, monkeypatch):
+    """`~nosuchuser` in a path setting is reported as a validation error, not RuntimeError."""
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text("images_base_path: ~nosuchuser_zz\n")
+    monkeypatch.setenv("QEMULAB_CONFIG", str(cfg))
+    with pytest.raises(ValidationError):
+        Settings()

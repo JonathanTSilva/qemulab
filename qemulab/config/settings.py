@@ -17,10 +17,21 @@ def default_scenarios_path() -> Path:
     return Path(base).expanduser() / "qemulab" / "scenarios"
 
 
+class ConfigFormatError(ValueError):
+    """A config file parsed as YAML but is not a mapping with string keys."""
+
+
 def _load_yaml(path: Path) -> dict[str, Any]:
     if path.is_file():
         with path.open() as f:
-            return yaml.safe_load(f) or {}
+            loaded = yaml.safe_load(f) or {}
+        if not isinstance(loaded, dict):
+            msg = f"{path}: config must be a YAML mapping, got {type(loaded).__name__}"
+            raise ConfigFormatError(msg)
+        if not all(isinstance(key, str) for key in loaded):
+            msg = f"{path}: config keys must be strings"
+            raise ConfigFormatError(msg)
+        return loaded
     return {}
 
 
@@ -158,7 +169,10 @@ class Settings(BaseSettings):
     @field_validator("images_base_path", "scenarios_path")
     @classmethod
     def _expand_user(cls, value: Path) -> Path:
-        return value.expanduser()
+        try:
+            return value.expanduser()
+        except RuntimeError as exc:  # unknown "~user": surface as a validation error
+            raise ValueError(str(exc)) from exc
 
     @classmethod
     def settings_customise_sources(

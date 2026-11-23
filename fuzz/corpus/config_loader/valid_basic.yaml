@@ -1,0 +1,3 @@
+images_base_path: ~/imgs
+max_nodes_limit: 2
+tmux_session_name: lab
