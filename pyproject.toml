@@ -135,7 +135,11 @@ filterwarnings = [
 
 [tool.coverage.run]
 source = ["qemulab"]
-omit = ["*/tests/*", "*/__pycache__/*"]
+# __main__.py is a 3-line `python -m` shim that only calls main(), which is tested directly.
+omit = ["*/tests/*", "*/__pycache__/*", "qemulab/__main__.py"]
+
+[tool.coverage.report]
+fail_under = 95
 
 [tool.taskipy.tasks]
 test = "python -m pytest tests -vv"

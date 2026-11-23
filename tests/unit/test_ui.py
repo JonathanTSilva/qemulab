@@ -4,7 +4,6 @@ from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
-from rich.text import Text
 from textual.screen import Screen
 from textual.widgets import ListView, RichLog
 
@@ -480,14 +479,15 @@ class TestRunningScreen:
                 yield RunningScreen(id="test-running")
 
         app = TestApp()
-        async with app.run_test():
+        async with app.run_test() as pilot:
             screen = app.query_one("#test-running", RunningScreen)
 
-            # The app code likely accesses ._lines, which might be missing in
-            # this version of Textual or is an internal API.
-            # We "polyfill" it on the RichLog widget to make the app code happy.
-            log_view = screen.query_one("#log-view")
-            log_view._lines = [Text("Test log line 1"), Text("Test log line 2")]
+            log_view = screen.query_one("#log-view", RichLog)
+            screen.show_logs()
+            await pilot.pause()
+            log_view.write("Test log line 1")
+            log_view.write("Test log line 2")
+            await pilot.pause()
 
             # Save logs
             # We mock Path.cwd so save_logs() uses our tmp_path
@@ -501,6 +501,7 @@ class TestRunningScreen:
             # Verify file was created
             log_files = list(tmp_path.glob("qemulab_session_*.log"))
             assert len(log_files) == 1
+            assert log_files[0].read_text() == "Test log line 1\nTest log line 2"
 
 
 # ============================================================================
@@ -851,3 +852,15 @@ class TestPerformance:
 
             # Should complete 5 steps in under 2 seconds
             assert elapsed < 2.0
+
+
+def test_textual_handler_swallows_widget_errors():
+    import logging
+
+    from qemulab.ui.screens.running import TextualHandler
+
+    widget = MagicMock()
+    widget.write.side_effect = RuntimeError("widget gone")
+    handler = TextualHandler(widget)
+    handler.emit(logging.LogRecord("n", logging.INFO, "p", 1, "m", (), None))
+    widget.write.assert_called_once()
