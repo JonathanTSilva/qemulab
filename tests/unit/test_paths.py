@@ -114,3 +114,20 @@ def test_runtime_base_dir_falls_back_to_mkdtemp(tmp_path, monkeypatch):
 
 def test_flash_dir_for_honours_override():
     assert str(flash_dir_for(2, "/srv/q/flash_")) == "/srv/q/flash_2"
+
+
+def test_validate_dir(tmp_path):
+    assert paths.validate_dir(tmp_path) is True
+    assert paths.validate_dir(tmp_path / "missing") is False
+    file = tmp_path / "f"
+    file.write_text("x")
+    assert paths.validate_dir(file) is False
+
+
+def test_verify_safe_for_sudo_allows_missing_path(tmp_path):
+    missing = tmp_path / "not" / "yet"
+    assert paths.verify_safe_for_sudo(missing) == missing
+
+
+def test_remove_tree_ignores_missing_path(tmp_path):
+    paths.remove_tree(tmp_path / "gone")

@@ -84,15 +84,8 @@ class RunningScreen(Vertical):
         try:
             log_view = self.query_one("#log-view", RichLog)
 
-            # Extract lines from RichLog
-            lines = []
-            for line in log_view._lines:
-                if hasattr(line, "plain"):
-                    lines.append(line.plain)
-                else:
-                    lines.append(str(line))
-
-            log_content = "\n".join(lines)
+            # RichLog keeps rendered lines as Strips in its public `lines` list
+            log_content = "\n".join(strip.text.rstrip() for strip in log_view.lines)
 
             # Save to current directory with timestamp
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
