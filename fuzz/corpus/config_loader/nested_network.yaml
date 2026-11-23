@@ -1,0 +1,7 @@
+network:
+  mgmt:
+    base_ip: 10.0.0.1
+    netmask: 16
+common_commands:
+  - command: uname -a
+    password_env: PW

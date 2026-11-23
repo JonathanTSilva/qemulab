@@ -86,6 +86,7 @@ max-complexity = 10
 [tool.pyright]
 include = ["qemulab", "tests"]
 typeCheckingMode = "basic"
+extraPaths = ["fuzz"]
 # Follow-up: tighten these to errors once the Textual/pydantic typing issues are fixed.
 reportArgumentType = "warning"
 reportAttributeAccessIssue = "warning"
@@ -96,7 +97,7 @@ reportReturnType = "warning"
 [tool.pytest.ini_options]
 minversion = "7.0"
 testpaths = ["tests"]
-pythonpath = ["qemulab"]
+pythonpath = ["qemulab", "fuzz"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
