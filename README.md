@@ -12,6 +12,7 @@
 [![Coverage](https://codecov.io/gh/JonathanTSilva/qemulab/graph/badge.svg)](https://codecov.io/gh/JonathanTSilva/qemulab)
 [![Quality](https://sonarcloud.io/api/project_badges/measure?project=JonathanTSilva_qemulab&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=JonathanTSilva_qemulab)
 [![Scorecard](https://img.shields.io/ossf-scorecard/github.com/JonathanTSilva/qemulab?style=flat-square&label=scorecard)](https://scorecard.dev/viewer/?uri=github.com/JonathanTSilva/qemulab)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/17180/badge)](https://www.bestpractices.dev/projects/17180)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Codespaces](https://img.shields.io/badge/codespaces-open-181717?style=flat-square&logo=github)](https://codespaces.new/JonathanTSilva/qemulab)
 <!-- badges:end -->
